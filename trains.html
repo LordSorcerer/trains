@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Milonga" rel="stylesheet">
+    <link href="./assets/css/trains.css" rel="stylesheet">
+    <title>Just a Training Excerise</title>
+</head>
+
+<body>
+    <header>
+        <h1>Just a Training Exercise</h1>
+    </header>
+    <main>
+        <h2>Trains</h2>
+        <table id="trainTable">
+            <tr>
+                <td>Train Name</td>
+                <td>Destination</td>
+                <td>Frequency (minutes)</td>
+                <td>Next Arrival</td>
+                <td>Minutes Away</td>
+            </tr>
+        </table>
+        <br>
+        <div id="addTrain">
+            <h2>Add a Train</h2>
+            <form>
+                <p>Train Name:
+                </p>
+                <input id="nameInput" type="text" value="" size="80">
+                <p>Destination:
+                </p>
+                <input id="destinationInput" type="text" value="" size="80">
+                <p>Frequency (minutes):
+                </p>
+                <input id="frequencyInput" type="text" value="" size="80">
+                <p>First Arrival (HH:mm [24 hour clock]):
+                </p>
+                <input id="firstArrivalInput" type="text" value="" size="80">
+                <br>
+                <input id="submitNewTrain" type="submit" value="submit">
+            </form>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+    <script type="text/javascript" src="./assets/javascript/moment.js"></script>
+    <script type="text/javascript" src="./assets/javascript/trains.js"></script>
+</body>
+
+</html>

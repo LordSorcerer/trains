@@ -1,0 +1,39 @@
+body {
+    width: 960px;
+    text-align: center;
+    color: white;
+    background-image: url('../graphics/train1.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 0px auto;
+}
+
+header {
+    width: 100%;
+    border: 3px white solid;
+    background-color: darkblue;
+    margin: 20px 0px 0px 0px;
+}
+
+main {
+    width: 100%;
+    border: 3px white solid;
+    background-color: darkblue;
+    margin: 20px 0px 0px 0px;
+}
+
+#addTable {
+    margin: 20px 5px;
+}
+
+#submitNewTrain {
+    margin: 10px 0px;
+}
+
+table {
+    width: 80%;
+    border: 3px white solid;
+    background-color: darkblue;
+    margin: 10px auto;
+}
