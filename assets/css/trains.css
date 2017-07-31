@@ -11,14 +11,14 @@ body {
 
 header {
     width: 100%;
-    border: 3px white solid;
+    border: 2px white solid;
     background-color: darkblue;
     margin: 20px 0px 0px 0px;
 }
 
 main {
     width: 100%;
-    border: 3px white solid;
+    border: 2px white solid;
     background-color: darkblue;
     margin: 20px 0px 0px 0px;
 }
@@ -30,10 +30,14 @@ main {
 #submitNewTrain {
     margin: 10px 0px;
 }
+#headerRow {
+    background-color:lightblue;
+    color: darkblue;
+}
 
 table {
     width: 80%;
-    border: 3px white solid;
+    border: 2px white solid;
     background-color: darkblue;
     margin: 10px auto;
 }

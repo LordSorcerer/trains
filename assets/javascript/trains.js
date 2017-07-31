@@ -9,14 +9,38 @@ var config = {
 };
 firebase.initializeApp(config);
 
-var database = firebase.database();
+var database = firebase.database(),
+    currentTime, updateTime;
+var htmlNow = $("#now")
 
+
+
+function setupTimers() {
+    //Load and update the current time down to the second
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    //calculate amount of time remaining until the next minute, in seconds
+    currentTime = moment();
+    updateTime = moment(currentTime).seconds();
+    updateTime = 60 - updateTime;
+    console.log(updateTime);
+    //set a Timeout to begin at the start of the new minute.  On Timeout, run updateAll() once per minute
+    setTimeout(function() {
+        setInterval(updateAll, 60000);
+    }, updateTime * 1000);
+};
+
+function updateCurrentTime() {
+    htmlNow.text("Current Time: " + moment().format("HH:mm:ss"));
+};
+
+function updateAll() {
+};
 
 //Event Handlers
 
 $(document).ready(function() {
-
-
+    setupTimers();
 });
 
 $("#submitNewTrain").on("click", function() {
@@ -25,9 +49,9 @@ $("#submitNewTrain").on("click", function() {
     var name = $("#nameInput").val().trim();
     var destination = $("#destinationInput").val().trim();
     var frequency = $("#frequencyInput").val().trim();
-    var firstArrival = $("#firstArrivalInput").val().trim();
+    var firstArrival = $("#firstArrivalInput").val();
+    console.log("FA: " + firstArrival);
     //Derived values
-
     database.ref().push({
         name: name,
         destination: destination,
@@ -37,29 +61,38 @@ $("#submitNewTrain").on("click", function() {
 
 });
 
-/*childSnapshot.val().firstArrival*/
 
-database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-    var nextArrival = childSnapshot.val().firstArrival;
-    var minutesAway = moment().diff(nextArrival);
-    console.log(nextArrival);
-    $("#trainTable").append("<tr><td>" + childSnapshot.val().name + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>")
+//Loads all existing child nodes into HTML and calculates derivatives
+database.ref().on("child_added", loadChildren);
+
+
+//this handles all the child loads
+function loadChildren (childSnapshot, prevChildKey) {
+    //get train's first arrival time
+    var tempMoment = moment(childSnapshot.val().firstArrival, 'HH:mm');
+    var dataChildKey = childSnapshot.key;
+    var nextArrival = tempMoment;
+    var minutesAway = moment(tempMoment).diff(moment(), 'minutes');
+    var tempMinutes = minutesAway;
+    //Handles first arrival times already in the past - figures the number of frequency intervals and adds the difference to the next arrival and calculates minutes away
+    if (minutesAway < 0) {
+        var increments = Math.abs(minutesAway),
+            remainder = 0;
+        remainder = increments % childSnapshot.val().frequency;
+        increments = Math.floor(increments / childSnapshot.val().frequency) + 1;
+        nextArrival = moment(nextArrival).add(increments * childSnapshot.val().frequency, 'minutes');
+        minutesAway = childSnapshot.val().frequency - remainder;
+    };
+    console.log("Key: " + dataChildKey);
+    $("#trainTable").append("<tr class='trainListing'><td>" + childSnapshot.val().name + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + nextArrival.format('HH:mm') + "</td><td>" + minutesAway + "</td><td><button class='deleteBtn' data-childKey=" + dataChildKey + ">Delete</button></td>");
+}
+//Removes all references, database and HTML, to the train tied to the delete button.  Uses a confirm popup to ... confirm the delete!
+$(document).on("click", ".deleteBtn", function() {
+    if (confirm("Are you sure you wish to delete this train?")) {
+        //remove the database entry
+        var remKey = $(this).data('childkey');
+        database.ref().child(remKey).remove();
+        //remove the entire train from the HTML table
+        $(this).parent().parent().remove();
+    };
 });
-
-/*    var randomDate = "02/23/1999";
-
-    // Using scripts from moment.js write code below to complete each of the following.
-    // Console.log to confirm the code changes we made worked.
-    console.log(moment(randomDate).format("ddd MM YYYY"));
-    console.log(moment(randomDate).format("DD MM YYYY"));
-    console.log(moment(randomDate).format("d MM YYYY"));
-    console.log("From Now " + moment(randomDate).diff(moment(), 'days'));
-
-    // 2 ...to determine the time in years, months, days between today and the randomDate
-    // 3 ...to determine the number of days between the randomDate and 02/14/2001
-    // 4 ...to convert the randomDate to unix time (be sure to look up what unix time even is!!!)
-    // 5 ...to determine what day of the week and what week of the year this randomDate falls on.
-
-    // If you finish early...
-    // Start creating HTML inputs and then redisplay the dates using moment.js elsewhere on the page.
-*/
