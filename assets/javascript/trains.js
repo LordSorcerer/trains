@@ -14,7 +14,6 @@ var database = firebase.database(),
 var htmlNow = $("#now")
 
 
-
 function setupTimers() {
     //Load and update the current time down to the second
     updateCurrentTime();
@@ -34,7 +33,9 @@ function updateCurrentTime() {
     htmlNow.text("Current Time: " + moment().format("HH:mm:ss"));
 };
 
+//currently empty.  Will modify each entry's minutesAway and, if that value goes below zero, add frequency to it
 function updateAll() {
+
 };
 
 //Event Handlers
@@ -50,8 +51,7 @@ $("#submitNewTrain").on("click", function() {
     var destination = $("#destinationInput").val().trim();
     var frequency = $("#frequencyInput").val().trim();
     var firstArrival = $("#firstArrivalInput").val();
-    console.log("FA: " + firstArrival);
-    //Derived values
+    /* console.log("FA: " + firstArrival);*/
     database.ref().push({
         name: name,
         destination: destination,
@@ -62,12 +62,12 @@ $("#submitNewTrain").on("click", function() {
 });
 
 
-//Loads all existing child nodes into HTML and calculates derivatives
+//Loads all existing child nodes into HTML framework
 database.ref().on("child_added", loadChildren);
 
 
-//this handles all the child loads
-function loadChildren (childSnapshot, prevChildKey) {
+//this handles all the child loads and calculates derivatives
+function loadChildren(childSnapshot, prevChildKey) {
     //get train's first arrival time
     var tempMoment = moment(childSnapshot.val().firstArrival, 'HH:mm');
     var dataChildKey = childSnapshot.key;
@@ -83,16 +83,18 @@ function loadChildren (childSnapshot, prevChildKey) {
         nextArrival = moment(nextArrival).add(increments * childSnapshot.val().frequency, 'minutes');
         minutesAway = childSnapshot.val().frequency - remainder;
     };
-    console.log("Key: " + dataChildKey);
+    /*    console.log("Key: " + dataChildKey);*/
     $("#trainTable").append("<tr class='trainListing'><td>" + childSnapshot.val().name + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + nextArrival.format('HH:mm') + "</td><td>" + minutesAway + "</td><td><button class='deleteBtn' data-childKey=" + dataChildKey + ">Delete</button></td>");
-}
-//Removes all references, database and HTML, to the train tied to the delete button.  Uses a confirm popup to ... confirm the delete!
+};
+
+
+//Removes all references, database and HTML, to the train tied to the delete button.  Uses a confirm popup to prevent accidents.
 $(document).on("click", ".deleteBtn", function() {
     if (confirm("Are you sure you wish to delete this train?")) {
-        //remove the database entry
+        //remove the train's database entry
         var remKey = $(this).data('childkey');
         database.ref().child(remKey).remove();
-        //remove the entire train from the HTML table
+        //remove the train's HTML table entry
         $(this).parent().parent().remove();
     };
 });
