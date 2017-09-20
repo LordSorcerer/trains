@@ -23,8 +23,9 @@ function setupTimers() {
     updateTime = moment(currentTime).seconds();
     updateTime = 60 - updateTime;
     console.log(updateTime);
-    //set a Timeout to begin at the start of the new minute.  On Timeout, run updateAll() once per minute
+    //set a Timeout to begin at the start of the new minute.  On Timeout, run updateAll() once and setInterval to run it once per minute
     setTimeout(function() {
+        updateAll();
         setInterval(updateAll, 60000);
     }, updateTime * 1000);
 };
@@ -35,6 +36,7 @@ function updateCurrentTime() {
 
 //currently empty.  Will modify each entry's minutesAway and, if that value goes below zero, add frequency to it
 function updateAll() {
+
 
 };
 
@@ -58,13 +60,13 @@ $("#submitNewTrain").on("click", function() {
         frequency: frequency,
         firstArrival: firstArrival,
     });
-
+    console.log(database.ref().child(value));
 });
 
 
 //Loads all existing child nodes into HTML framework
 database.ref().on("child_added", loadChildren);
-
+database.ref().on("child_changed", loadChildren);
 
 //this handles all the child loads and calculates derivatives
 function loadChildren(childSnapshot, prevChildKey) {
